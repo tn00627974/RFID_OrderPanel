@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=100%, initial-scale=1.0">
+    <title>Web</title>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: rgb(255, 255, 255);
+            color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            /* 防止滾動條 */
+        }
+
+        h1 {
+            background-color: #FF007F;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: block;
+            font-size: 4em;
+            margin: 0;
+            /* 移除上下邊距 */
+            font-weight: bold;
+            unicode-bidi: isolate;
+            width: 100%;
+            /* 滿版顯示 */
+            box-sizing: border-box;
+            /* 包含內邊距和邊框 */
+        }
+
+        #queue {
+            font-size: 36px;
+            margin-top: 20px;
+        }
+
+        .completed {
+            font-size: 50px;
+            font-weight: bold;
+            color: rgb(0, 0, 0);
+        }
+
+        #container {
+            display: flex;
+            margin-top: 0px;
+            height: calc(100% - 60px);
+            /* 減去 h1 的高度 */
+        }
+
+        .left-column {
+            width: 50%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        .right-column {
+            width: 50%;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waiting {
+            font-size: 36px;
+            font-weight: bold;
+            color: rgb(0, 0, 0);
+        }
+
+        #fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            background-color: #FF007F;
+            color: rgb(255, 255, 255);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #ads {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            color: rgb(0, 0, 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+        }
+
+        .column h2 {
+            background-color: #0066CC;
+            color: rgb(255, 255, 255);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 2em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>工作站2 - 靜置區</h1>
+    <div id="container">
+        <div class="left-column">
+            <div class="column">
+                <h2>準備中</h2>
+                <div id="waiting"></div> <!-- 確保這個元素存在 -->
+            </div>
+            <div class="column">
+                <h2>進行中</h2>
+                <div id="completed"></div> <!-- 確保這個元素存在 -->
+            </div>
+        </div>
+        <div class="right-column">
+            <div id="ads">廣告區域</div>
+        </div>
+    </div>
+    <button id="fullscreen-btn">全螢幕模式</button>
+
+
+
+
+    <script>
+        const items = [
+            "製氧機", "電動床", "氣墊床", "便盆椅", "洗澡椅", "抽痰機", "噴霧器", "鋼瓶",
+            "輪椅", "拐杖", "助行器", "坐墊", "復健", "移位", "關節護具", "血氧機", "其他"
+        ];
+
+        let orders = [];
+
+        function generateRFID() {
+            const number = Math.floor(Math.random() * 100) + 1;
+            return `RFID${number.toString().padStart(3, '0')}`;
+        }
+
+        function updateDisplay() {
+            let waitingDiv = document.getElementById("waiting");
+            let completedDiv = document.getElementById("completed");
+            waitingDiv.innerHTML = "";
+            completedDiv.innerHTML = "";
+
+            orders.forEach(order => {
+                let orderDiv = document.createElement("div");
+                orderDiv.innerHTML = `${order.number} - ${order.item}`;
+
+                if (order.status === "completed") {
+                    orderDiv.classList.add("completed");
+                    completedDiv.appendChild(orderDiv);
+                } else {
+                    orderDiv.classList.add("waiting");
+                    waitingDiv.appendChild(orderDiv);
+                }
+            });
+        }
+
+        function addOrder() {
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            const number = generateRFID();
+            orders.unshift({ number, status: "waiting", item: randomItem });
+            updateDisplay();
+        }
+
+        function completeOrder() {
+            let waitingOrder = orders.find(order => order.status === "waiting");
+            if (waitingOrder) {
+                waitingOrder.status = "completed";
+                updateDisplay();
+            }
+        }
+
+        setInterval(() => {
+            if (Math.random() > 0.5) {
+                addOrder();
+            } else {
+                completeOrder();
+            }
+        }, 5000);
+
+        updateDisplay();
+
+        // function enterFullscreen() {
+        //     if (document.documentElement.requestFullscreen) {
+        //         document.documentElement.requestFullscreen();
+        //     } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+        //         document.documentElement.mozRequestFullScreen();
+        //     } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        //         document.documentElement.webkitRequestFullscreen();
+        //     } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+        //         document.documentElement.msRequestFullscreen();
+        //     }
+        // }
+
+        // // window.onload = () => {
+        // //     document.getElementById("fullscreen-btn").click();
+        // // };
+
+        // document.getElementById("fullscreen-btn").addEventListener("click", enterFullscreen);
+
+        // window.onload = () => {
+        //     document.addEventListener("click", function () {
+        //         enterFullscreen();
+        //     }, { once: true }); // 確保只執行一次
+
+        //     setTimeout(() => {
+        //         const video = document.querySelector("#ads video");
+        //         if (video) {
+        //             video.play();
+        //             video.onended = () => {
+        //                 console.log("影片播放完畢");
+        //             };
+        //         }
+        //     }, 5000);
+        // };
+
+
+
+        const youtubeLinks = [
+            "https://www.youtube.com/embed/7RE1lp4PmW4"
+        ];
+
+        const localVideoPath = "PathYourMp4.mp4"; // 替換為你的本地影片路徑
+
+        function updateAds() {
+            const adsDiv = document.getElementById("ads");
+            adsDiv.innerHTML = `
+                    <video width="100%" height="100%" controls autoplay>
+                        <source src="${localVideoPath}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `;
+        }
+
+        setInterval(updateAds, 10000); // 每10秒更新一次廣告
+        updateAds(); // 初始載入時更新一次廣告
+    </script>
+
+    <script>
+        function enterFullscreen() {
+            let elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { // Firefox
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, Opera
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { // IE/Edge
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // 直接在頁面載入時觸發全螢幕
+        document.addEventListener('DOMContentLoaded', function () {
+            // 延遲執行以確保瀏覽器準備就緒
+            setTimeout(() => {
+                // 模擬使用者互動
+                document.body.click();
+                enterFullscreen();
+            }, 1000);
+        });
+
+        // 備用方案：點擊任何地方進入全螢幕
+        document.addEventListener('click', function () {
+            enterFullscreen();
+        }, { once: true }); // 確保只執行一次
+
+        // 保留按鈕功能
+        document.getElementById("fullscreen-btn").addEventListener("click", enterFullscreen);
+    </script>
+</body>
+
+</html>
