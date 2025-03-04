@@ -67,8 +67,9 @@
             height: 100%;
             background-color: black;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            /* align-items: center;
+            justify-content: center; */
         }
 
         .waiting {
@@ -78,11 +79,12 @@
         }
 
         #fullscreen-btn {
+            background-color: #FF007F;
             position: absolute;
             top: 10px;
             right: 10px;
             padding: 10px 20px;
-            background-color: #FF007F;
+            
             color: rgb(255, 255, 255);
             border: none;
             cursor: pointer;
@@ -107,6 +109,16 @@
             border-radius: 5px;
             font-size: 2em;
         }
+        #video-select {
+            background-color: #FF007F;
+            color: rgb(255, 255, 255);
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
     </style>
 </head>
 
@@ -125,9 +137,19 @@
         </div>
         <div class="right-column">
             <div id="ads">廣告區域</div>
+            
         </div>
     </div>
     <button id="fullscreen-btn">全螢幕模式</button>
+    <select id="video-select">
+        <option value="random">隨機播放</option>
+        <option value="0">噴霧器</option>
+        <option value="1">居家照顧床</option>
+        <option value="2">血氧機</option>
+        <option value="3">抽痰機</option>
+        <option value="4">氧氣鋼瓶</option>
+        <option value="5">製氧機</option>
+    </select>
 
 
 
@@ -190,59 +212,55 @@
 
         updateDisplay();
 
-        // function enterFullscreen() {
-        //     if (document.documentElement.requestFullscreen) {
-        //         document.documentElement.requestFullscreen();
-        //     } else if (document.documentElement.mozRequestFullScreen) { // Firefox
-        //         document.documentElement.mozRequestFullScreen();
-        //     } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
-        //         document.documentElement.webkitRequestFullscreen();
-        //     } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
-        //         document.documentElement.msRequestFullscreen();
-        //     }
-        // }
-
-        // // window.onload = () => {
-        // //     document.getElementById("fullscreen-btn").click();
-        // // };
-
-        // document.getElementById("fullscreen-btn").addEventListener("click", enterFullscreen);
-
-        // window.onload = () => {
-        //     document.addEventListener("click", function () {
-        //         enterFullscreen();
-        //     }, { once: true }); // 確保只執行一次
-
-        //     setTimeout(() => {
-        //         const video = document.querySelector("#ads video");
-        //         if (video) {
-        //             video.play();
-        //             video.onended = () => {
-        //                 console.log("影片播放完畢");
-        //             };
-        //         }
-        //     }, 5000);
-        // };
-
-
-
+        // 廣告區域  ( Youtube )
         const youtubeLinks = [
-            "https://www.youtube.com/embed/7RE1lp4PmW4"
+            "https://www.youtube.com/embed/s8U__oJviok?rel=0&autoplay=1", // 噴霧器
+            "https://www.youtube.com/embed/ITYpyRAlgr8?rel=0&autoplay=1", // 居家照顧床
+            "https://www.youtube.com/embed/0byUSR2xVHg?rel=0&autoplay=1", // 血氧機
+            "https://www.youtube.com/embed/RppXY3sUrqw?rel=0&autoplay=1", // 抽痰機
+            "https://www.youtube.com/embed/HOP93KXbCkM?rel=0&autoplay=1", // 氧氣鋼瓶
+            "https://www.youtube.com/embed/heR6W2AUwKI?rel=0&autoplay=1"  // 製氧機
         ];
-
-        const localVideoPath = "PathYourMp4.mp4"; // 替換為你的本地影片路徑
 
         function updateAds() {
             const adsDiv = document.getElementById("ads");
+            const videoSelect = document.getElementById("video-select");
+            let videoIndex = videoSelect.value;
+
+            if (videoIndex === "random") {
+                videoIndex = Math.floor(Math.random() * youtubeLinks.length);
+            }
+
             adsDiv.innerHTML = `
-                    <video width="100%" height="100%" controls autoplay>
-                        <source src="${localVideoPath}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                `;
+                <iframe 
+                    width="100%" height="100%" controls autoplay 
+                    src="${youtubeLinks[videoIndex]}" frameborder="0" 
+                    allow="accelerometer; autoplay; 
+                    encrypted-media; gyroscope; 
+                    picture-in-picture" 
+                    allowfullscreen>                    
+                </iframe>
+            `;
         }
 
-        setInterval(updateAds, 10000); // 每10秒更新一次廣告
+        document.getElementById("video-select").addEventListener("change", updateAds);
+
+
+        // 廣告區域  ( Local )
+        // const localVideoPath = "PathYourMp4.mp4"; // 替換為你的本地影片路徑
+        
+        // function updateAds() {
+        //     const adsDiv = document.getElementById("ads");
+        //     adsDiv.innerHTML = `
+        //         <video width="100%" height="100%" controls autoplay>
+        //             <source src="${localVideoPath}" type="video/mp4">
+        //             Your browser does not support the video tag.
+        //         </video>
+        //     `;
+        // }
+
+
+        setInterval(updateAds, 30000); // 更新一次廣告
         updateAds(); // 初始載入時更新一次廣告
     </script>
 
